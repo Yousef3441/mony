@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>کرایه مدرسه</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:18px;
+  background:#0b1220;color:#fff;
+  font-family:Tahoma,Arial,sans-serif
+}
+main{max-width:650px;margin:auto}
+h1{text-align:center;color:#50d6a0}
+.card{
+  background:#172338;padding:18px;
+  border-radius:16px;margin:15px 0
+}
+label{display:block;margin:12px 0 7px;color:#c4d0df}
+input{
+  width:100%;padding:13px;border-radius:10px;
+  border:1px solid #344761;background:#0b1220;
+  color:white;font-size:16px
+}
+button{
+  border:0;border-radius:10px;padding:12px;
+  cursor:pointer;font-size:15px;font-weight:bold
+}
+.save{width:100%;margin-top:15px;background:#50d6a0;color:#082018}
+.secondary{background:#293a53;color:white}
+.danger{background:#702b38;color:white}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#22324a;padding:15px;border-radius:12px}
+.stat strong{display:block;margin-top:10px;color:#50d6a0}
+.row{display:flex;gap:8px;margin:10px 0}
+.row button{flex:1}
+.entry{padding:12px 0;border-bottom:1px solid #344761;line-height:2}
+.muted{color:#aab8cc;font-size:13px;line-height:1.8}
+</style>
+</head>
+<body>
+<main>
+<h1>🎒 کرایه مدرسه</h1>
+<p id="today" class="muted" style="text-align:center"></p>
+
+<div class="stats">
+  <div class="stat">هزینه امروز<strong id="todayTotal">۰ تومان</strong></div>
+  <div class="stat">هزینه این ماه<strong id="monthTotal">۰ تومان</strong></div>
+</div>
+
+<section class="card">
+<h3>📝 ثبت هزینه</h3>
+
+<label for="date">تاریخ</label>
+<input type="date" id="date">
+
+<label for="going">🚕 کرایه رفت (تومان)</label>
+<input type="number" id="going" min="0" placeholder="مثلاً ۲۰۰۰۰">
+
+<label for="returning">🏠 کرایه برگشت (تومان)</label>
+<input type="number" id="returning" min="0" placeholder="مثلاً ۲۰۰۰۰">
+
+<button class="save" id="save">ذخیره کرایه‌ها</button>
+
+<div class="row">
+<button class="secondary" id="reminders">فعال‌کردن یادآوری</button>
+<button class="secondary" id="backup">خروجی پشتیبان</button>
+</div>
+<p class="muted">
+اطلاعات در مرورگر ذخیره می‌شود. برای جلوگیری از ازدست‌رفتن اطلاعات،
+از بخش پشتیبان خروجی بگیر.
+</p>
+</section>
+
+<section class="card">
+<h3>📊 گزارش هزینه‌ها</h3>
+<div class="row">
+<button class="secondary" id="week">گزارش هفتگی</button>
+<button class="secondary" id="month">گزارش ماهانه</button>
+</div>
+<p>کرایه رفت: <strong id="reportGoing">۰</strong></p>
+<p>کرایه برگشت: <strong id="reportReturn">۰</strong></p>
+<p>مجموع: <strong id="reportTotal">۰</strong></p>
+<p>روزهای ثبت‌شده: <strong id="reportDays">۰</strong></p>
+</section>
+
+<section class="card">
+<h3>📅 سوابق</h3>
+<div id="history"></div>
+<div class="row">
+<button class="secondary" id="restore">بازیابی پشتیبان</button>
+<button class="danger" id="clear">پاک‌کردن همه</button>
+</div>
+<input type="file" id="file" accept=".json" hidden>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY = "schoolFareData";
+let data = {};
+
+try {
+  data = JSON.parse(localStorage.getItem(KEY) || "{}");
+} catch(e) {
+  data = {};
+}
+
+let reportMode = "week";
+
+const pad = n => String(n).padStart(2,"0");
+const dateKey = d =>
+  `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+const today = dateKey(new Date());
+$("date").value = today;
+
+$("today").textContent =
+  new Date().toLocaleDateString("fa-IR", {
+    weekday:"long", year:"numeric",
+    month:"long", day:"numeric"
+  });
+
+function money(n) {
+  return (Number(n)||0).toLocaleString("fa-IR") + " تومان";
+}
+
+function total(r) {
+  return (Number(r.going)||0) +
+         (Number(r.returning)||0);
+}
+
+function persist() {
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function render() {
+  const now = new Date();
+  const currentDate = dateKey(now);
+  const currentMonth = currentDate.slice(0,7);
+
+  let todayCost = total(data[currentDate] || {});
+  let monthCost = 0;
+
+  Object.keys(data).forEach(k => {
+    if(k.startsWith(currentMonth))
+      monthCost += total(data[k]);
+  });
+
+  $("todayTotal").textContent = money(todayCost);
+  $("monthTotal").textContent = money(monthCost);
+
+  const selected = $("date").value;
+  const selectedData = data[selected] || {};
+
+  $("going").value = selectedData.going ?? "";
+  $("returning").value = selectedData.returning ?? "";
+
+  let start, end;
+
+  if(reportMode === "week") {
+    start = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const day = (start.getDay()+6)%7;
+    start.setDate(start.getDate()-day);
+    end = new Date(start);
+    end.setDate(end.getDate()+7);
+  } else {
+    start = new Date(now.getFullYear(),now.getMonth(),1);
+    end = new Date(now.getFullYear(),now.getMonth()+1,1);
+  }
+
+  let going = 0, returning = 0, days = 0;
+
+  Object.entries(data).forEach(([key,r]) => {
+    const d = new Date(key+"T12:00:00");
+    if(d >= start && d < end) {
+      going += Number(r.going)||0;
+      returning += Number(r.returning)||0;
+      if(total(r)>0) days++;
+    }
+  });
+
+  $("reportGoing").textContent = money(going);
+  $("reportReturn").textContent = money(returning);
+  $("reportTotal").textContent = money(going+returning);
+  $("reportDays").textContent = days.toLocaleString("fa-IR");
+
+  const keys = Object.keys(data)
+    .filter(k => total(data[k])>0)
+    .sort((a,b)=>b.localeCompare(a));
+
+  $("history").innerHTML = "";
+
+  if(!keys.length) {
+    $("history").textContent = "هنوز هزینه‌ای ثبت نشده.";
+  }
+
+  keys.forEach(key => {
+    const r = data[key];
+    const item = document.createElement("div");
+    item.className = "entry";
+
+    const date = document.createElement("strong");
+    date.textContent =
+      new Date(key+"T12:00:00").toLocaleDateString("fa-IR");
+
+    const details = document.createElement("div");
+    details.textContent =
+      `رفت: ${money(r.going)} | برگشت: ${money(r.returning)} | مجموع: ${money(total(r))}`;
+
+    const del = document.createElement("button");
+    del.textContent = "حذف این روز";
+    del.className = "danger";
+
+    del.onclick = () => {
+      if(confirm("این سابقه حذف شود؟")) {
+        delete data[key];
+        persist();
+        render();
+      }
+    };
+
+    item.append(date,details,del);
+    $("history").appendChild(item);
+  });
+}
+
+$("save").onclick = () => {
+  const d = $("date").value;
+  const g = $("going").value;
+  const r = $("returning").value;
+
+  if(!d) {
+    alert("تاریخ را انتخاب کن.");
+    return;
+  }
+
+  if(g === "" && r === "") {
+    delete data[d];
+  } else {
+    if(Number(g)<0 || Number(r)<0) {
+      alert("مبلغ نمی‌تواند منفی باشد.");
+      return;
+    }
+    data[d] = {
+      going:Number(g)||0,
+      returning:Number(r)||0
+    };
+  }
+
+  persist();
+  render();
+  alert("کرایه‌ها ذخیره شد ✅");
+};
+
+$("date").onchange = render;
+
+$("week").onclick = () => {
+  reportMode = "week";
+  render();
+};
+
+$("month").onclick = () => {
+  reportMode = "month";
+  render();
+};
+
+$("clear").onclick = () => {
+  if(confirm("همه سوابق پاک شوند؟")) {
+    data = {};
+    persist();
+    render();
+  }
+};
+
+$("backup").onclick = () => {
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "school-fare-backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+$("restore").onclick = () => $("file").click();
+
+$("file").onchange = async e => {
+  const f = e.target.files[0];
+  if(!f) return;
+
+  try {
+    const restored = JSON.parse(await f.text());
+    if(!restored || typeof restored !== "object" ||
+       Array.isArray(restored)) throw Error();
+
+    if(confirm("اطلاعات فعلی با پشتیبان جایگزین شود؟")) {
+      data = restored;
+      persist();
+      render();
+      alert("بازیابی انجام شد.");
+    }
+  } catch(err) {
+    alert("فایل پشتیبان معتبر نیست.");
+  }
+  e.target.value = "";
+};
+
+// یادآوری وقتی صفحه باز است
+let reminderInterval = null;
+
+$("reminders").onclick = async () => {
+  if(!("Notification" in window)) {
+    alert("این مرورگر اعلان را پشتیبانی نمی‌کند.");
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if(permission !== "granted") {
+    alert("اجازه اعلان فعال نشد.");
+    return;
+  }
+
+  alert("یادآوری فعال شد؛ صفحه باید باز بماند.");
+
+  if(reminderInterval) clearInterval(reminderInterval);
+
+  function checkTime() {
+    const now = new Date();
+    const key = dateKey(now);
+    const hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+    if(hm !== "07:00" && hm !== "14:00") return;
+
+    const reminderKey = `reminder_${key}_${hm}`;
+    if(localStorage.getItem(reminderKey)) return;
+
+    const kind = hm === "07:00"
+      ? "کرایه رفت مدرسه"
+      : "کرایه برگشت مدرسه";
+
+    new Notification("یادآوری کرایه مدرسه", {
+      body:`وقت ثبت ${kind} است.`
+    });
+
+    localStorage.setItem(reminderKey,"1");
+  }
+
+  checkTime();
+  reminderInterval = setInterval(checkTime,10000);
+};
+
+render();
+</script>
+</body>
+</html>
