@@ -4,104 +4,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
-<title>کرایه مدرسه</title>
+<meta name="theme-color" content="#090e12">
+<title>کرایه مدرسه | داشبورد</title>
 
 <style>
+:root{
+ --bg:#090e12;
+ --card:#121c20;
+ --card2:#18272a;
+ --green:#43e6a0;
+ --green2:#20b879;
+ --text:#f3faf7;
+ --muted:#9db1ab;
+ --border:#293c3a;
+}
 *{box-sizing:border-box}
 body{
- margin:0;padding:16px;background:#0b1220;color:#f4f7fb;
- font-family:Tahoma,Arial,sans-serif
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Tahoma,Arial,sans-serif;
+ padding:16px;line-height:1.7
 }
-main{max-width:650px;margin:auto}
-h1{text-align:center;color:#50d6a0;font-size:25px}
-p{line-height:1.8}
+main{max-width:760px;margin:auto}
+header{padding:12px 2px 18px}
+.logo{font-size:13px;color:var(--green)}
+h1{font-size:27px;margin:5px 0}
+h2{font-size:18px;margin:0 0 15px}
+h3{font-size:15px;margin:0 0 10px}
+.muted{color:var(--muted);font-size:12px}
 .card{
- background:#172338;border:1px solid #2b3b53;
- padding:17px;border-radius:16px;margin:14px 0
+ background:var(--card);border:1px solid var(--border);
+ padding:17px;border-radius:18px;margin:13px 0
 }
-label{display:block;margin:12px 0 7px;color:#bdcadd}
+.grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+.stat{
+ background:var(--card2);padding:15px;border-radius:14px;
+ border:1px solid var(--border);min-width:0
+}
+.stat small{color:var(--muted);font-size:12px}
+.stat strong{
+ display:block;color:var(--green);font-size:18px;
+ margin-top:8px;overflow-wrap:anywhere
+}
+label{display:block;margin:13px 0 6px;font-size:13px;color:var(--muted)}
 input{
- width:100%;padding:13px;background:#0b1423;
- color:white;border:1px solid #344761;border-radius:10px;
- font:inherit
+ width:100%;min-width:0;padding:13px;
+ border:1px solid var(--border);border-radius:11px;
+ background:#0a1316;color:white;font:inherit
 }
 button{
- padding:12px;border:0;border-radius:10px;
- font:inherit;font-weight:bold;cursor:pointer
+ border:0;border-radius:11px;padding:12px;
+ font:inherit;font-size:13px;font-weight:bold;cursor:pointer
 }
-.primary{background:#50d6a0;color:#082018;width:100%;margin-top:15px}
-.secondary{background:#293a53;color:white}
-.danger{background:#702b38;color:white}
-.row{display:flex;gap:8px;margin:12px 0}
+.primary{background:var(--green);color:#062117;width:100%;margin-top:15px}
+.secondary{background:#223532;color:var(--text);border:1px solid var(--border)}
+.danger{background:#54252c;color:#ffe5e7}
+.row{display:flex;gap:9px;margin-top:11px}
 .row button{flex:1}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#22324a;padding:14px;border-radius:12px}
-.stat strong{display:block;color:#50d6a0;margin-top:8px;font-size:15px;overflow-wrap:anywhere}
-.muted{font-size:12px;color:#aab8cc}
-.entry{border-bottom:1px solid #344761;padding:13px 0;line-height:2}
-.entry button{margin-top:8px}
+.report-line{
+ display:flex;justify-content:space-between;gap:10px;
+ border-bottom:1px solid var(--border);padding:10px 0
+}
+.report-line:last-child{border-bottom:0}
+.report-line span{color:var(--muted)}
+.report-line strong{overflow-wrap:anywhere;text-align:left}
+.entry{
+ padding:13px 0;border-bottom:1px solid var(--border)
+}
+.entry:last-child{border-bottom:0}
+.entry-title{font-weight:bold;color:var(--green)}
+.entry-detail{font-size:12px;color:var(--muted);margin:5px 0 9px}
+.pill{
+ display:inline-block;background:#203e32;color:var(--green);
+ border-radius:30px;padding:4px 10px;font-size:11px
+}
+.footer{text-align:center;color:#738780;font-size:11px;margin:20px 0}
+@media(max-width:390px){
+ body{padding:10px}
+ .stat strong{font-size:15px}
+ h1{font-size:23px}
+ .card{padding:13px}
+}
 </style>
 </head>
 
 <body>
 <main>
-<h1>🎒 کرایه مدرسه</h1>
-<p id="today" class="muted" style="text-align:center"></p>
 
-<div class="stats">
- <div class="stat">کرایه امروز<strong id="todayTotal">۰ تومان</strong></div>
- <div class="stat">کرایه این ماه<strong id="monthTotal">۰ تومان</strong></div>
-</div>
+<header>
+ <div class="logo">● SCHOOL FARE TRACKER</div>
+ <h1>🎒 کرایه مدرسه</h1>
+ <div id="todayLabel" class="muted"></div>
+</header>
 
-<section class="card">
-<h3>📝 ثبت کرایه</h3>
-
-<label for="date">تاریخ شمسی (مثلاً ۱۴۰۵/۰۷/۲۰)</label>
-<input id="date" inputmode="numeric" placeholder="۱۴۰۵/۰۷/۲۰">
-
-<label for="going">🚕 کرایه رفت (تومان)</label>
-<input id="going" type="number" min="0" placeholder="مثلاً ۲۰۰۰۰">
-
-<label for="returning">🏠 کرایه برگشت (تومان)</label>
-<input id="returning" type="number" min="0" placeholder="مثلاً ۲۰۰۰۰">
-
-<button class="primary" id="save">ذخیره کرایه‌ها</button>
-
-<div class="row">
-<button class="secondary" id="reminders">فعال‌کردن یادآوری</button>
-<button class="secondary" id="backup">پشتیبان‌گیری</button>
-</div>
-
-<p class="muted">
-اطلاعات در مرورگر همین دستگاه ذخیره می‌شود. برای جلوگیری از ازدست‌رفتن اطلاعات، مرتب پشتیبان بگیر.
-</p>
+<section class="grid">
+ <div class="stat">
+  <small>هزینه امروز</small>
+  <strong id="todayTotal">۰ تومان</strong>
+ </div>
+ <div class="stat">
+  <small>هزینه این هفته</small>
+  <strong id="weekTotal">۰ تومان</strong>
+ </div>
+ <div class="stat">
+  <small>هزینه این ماه</small>
+  <strong id="monthTotal">۰ تومان</strong>
+ </div>
+ <div class="stat">
+  <small>میانگین روزهای ثبت‌شده</small>
+  <strong id="average">۰ تومان</strong>
+ </div>
 </section>
 
 <section class="card">
-<h3>📊 گزارش هزینه‌ها</h3>
-<div class="row">
-<button class="secondary" id="week">این هفته</button>
-<button class="secondary" id="month">این ماه</button>
-</div>
-<p>کرایه رفت: <strong id="reportGoing">۰</strong></p>
-<p>کرایه برگشت: <strong id="reportReturn">۰</strong></p>
-<p>مجموع: <strong id="reportTotal">۰</strong></p>
-<p>روزهای ثبت‌شده: <strong id="reportDays">۰</strong></p>
+ <h2>📝 ثبت کرایه</h2>
+
+ <label for="date">تاریخ شمسی</label>
+ <input id="date" inputmode="numeric" placeholder="۱۴۰۵/۰۷/۲۰">
+
+ <label for="going">🚕 کرایه رفت (تومان)</label>
+ <input id="going" type="number" min="0" step="1000" placeholder="مثلاً ۲۰۰۰۰">
+
+ <label for="returning">🏠 کرایه برگشت (تومان)</label>
+ <input id="returning" type="number" min="0" step="1000" placeholder="مثلاً ۲۰۰۰۰">
+
+ <button class="primary" id="save">ذخیره کرایه‌ها</button>
+
+ <div class="row">
+  <button class="secondary" id="reminders">⏰ فعال‌کردن یادآوری</button>
+  <button class="secondary" id="backup">📤 پشتیبان‌گیری</button>
+ </div>
+ <p class="muted">
+ اطلاعات روی همین مرورگر ذخیره می‌شود. برای جلوگیری از ازدست‌رفتن اطلاعات، مرتب پشتیبان بگیر.
+ </p>
 </section>
 
 <section class="card">
-<h3>📅 سوابق کرایه</h3>
-<div id="history"></div>
-<div class="row">
-<button class="secondary" id="restore">بازیابی پشتیبان</button>
-<button class="danger" id="clear">پاک‌کردن همه</button>
-</div>
-<input type="file" id="file" accept=".json,application/json" hidden>
+ <h2>📊 گزارش هزینه‌ها</h2>
+ <div class="row">
+  <button class="secondary" id="weekBtn">این هفته</button>
+  <button class="secondary" id="monthBtn">این ماه</button>
+ </div>
+ <div class="report-line"><span>کرایه رفت</span><strong id="reportGoing">۰ تومان</strong></div>
+ <div class="report-line"><span>کرایه برگشت</span><strong id="reportReturn">۰ تومان</strong></div>
+ <div class="report-line"><span>مجموع هزینه</span><strong id="reportTotal">۰ تومان</strong></div>
+ <div class="report-line"><span>روزهای ثبت‌شده</span><strong id="reportDays">۰</strong></div>
 </section>
+
+<section class="card">
+ <h2>📅 سوابق روزانه</h2>
+ <div id="history"></div>
+ <div class="row">
+  <button class="secondary" id="restore">📥 بازیابی پشتیبان</button>
+  <button class="danger" id="clear">پاک‌کردن همه</button>
+ </div>
+ <input id="backupFile" type="file" accept=".json,application/json" hidden>
+</section>
+
+<div class="footer">نسخه محلی • طراحی مشکی و سبز</div>
 </main>
 
-<!-- کتابخانه تبدیل تاریخ شمسی و میلادی -->
 <script type="module">
 import {
  toJalaali,
@@ -110,15 +173,16 @@ import {
 } from "https://cdn.jsdelivr.net/npm/jalaali-js@1.2.8/+esm";
 
 const $ = id => document.getElementById(id);
-const KEY = "schoolFareDataJalali";
-
+const STORAGE_KEY = "schoolFareDashboard_v2";
 let data = {};
 let reportMode = "week";
+let reminderTimer = null;
 
 try {
- data = JSON.parse(localStorage.getItem(KEY) || "{}");
+ data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+ if(!data || typeof data !== "object" || Array.isArray(data)) data={};
 } catch(e) {
- data = {};
+ data={};
 }
 
 const pad = n => String(n).padStart(2,"0");
@@ -128,33 +192,30 @@ function isoDate(d) {
 }
 
 function jalaliText(d) {
- const j = toJalaali(
-  d.getFullYear(), d.getMonth()+1, d.getDate()
- );
+ const j=toJalaali(d.getFullYear(),d.getMonth()+1,d.getDate());
  return `${j.jy}/${pad(j.jm)}/${pad(j.jd)}`;
 }
 
-function normalizeDigits(value) {
- return value
-  .replace(/[۰-۹]/g, c => "۰۱۲۳۴۵۶۷۸۹".indexOf(c))
-  .replace(/[٠-٩]/g, c => "٠١٢٣٤٥٦٧٨٩".indexOf(c));
+function normalizeDigits(s) {
+ return s
+ .replace(/[۰-۹]/g,c=>"۰۱۲۳۴۵۶۷۸۹".indexOf(c))
+ .replace(/[٠-٩]/g,c=>"٠١٢٣٤٥٦٧٨٩".indexOf(c))
+ .trim().replace(/-/g,"/");
 }
 
-function parseJalali(value) {
- const s = normalizeDigits(value.trim()).replace(/-/g,"/");
- const m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+function parseJalali(s) {
+ const m=normalizeDigits(s).match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
  if(!m) return null;
 
- const jy=Number(m[1]), jm=Number(m[2]), jd=Number(m[3]);
-
+ const jy=Number(m[1]),jm=Number(m[2]),jd=Number(m[3]);
  if(!isValidJalaaliDate(jy,jm,jd)) return null;
 
  const g=toGregorian(jy,jm,jd);
  return `${g.gy}-${pad(g.gm)}-${pad(g.gd)}`;
 }
 
-function fromISO(iso) {
- const [y,m,d]=iso.split("-").map(Number);
+function fromISO(s) {
+ const [y,m,d]=s.split("-").map(Number);
  return new Date(y,m-1,d,12);
 }
 
@@ -167,146 +228,157 @@ function total(r) {
 }
 
 function persist() {
- localStorage.setItem(KEY,JSON.stringify(data));
+ try {
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+ } catch(e) {
+  alert("ذخیره انجام نشد. فضای مرورگر را بررسی کن.");
+ }
 }
 
-const now = new Date();
-$("date").value = jalaliText(now);
-$("today").textContent =
- "امروز: "+now.toLocaleDateString("fa-IR",{
-  weekday:"long",year:"numeric",month:"long",day:"numeric"
- });
-
-function jalaliMonthRange(date) {
+function monthRange(date) {
  const j=toJalaali(date.getFullYear(),date.getMonth()+1,date.getDate());
- const start=toGregorian(j.jy,j.jm,1);
- let ny=j.jy,nm=j.jm+1;
- if(nm===13){nm=1;ny++;}
- const end=toGregorian(ny,nm,1);
+ const a=toGregorian(j.jy,j.jm,1);
+ let jy=j.jy,jm=j.jm+1;
+ if(jm===13){jm=1;jy++;}
+ const b=toGregorian(jy,jm,1);
  return {
-  start:`${start.gy}-${pad(start.gm)}-${pad(start.gd)}`,
-  end:`${end.gy}-${pad(end.gm)}-${pad(end.gd)}`
+  start:`${a.gy}-${pad(a.gm)}-${pad(a.gd)}`,
+  end:`${b.gy}-${pad(b.gm)}-${pad(b.gd)}`
  };
 }
 
-function jalaliWeekRange(date) {
- // هفته شمسی از شنبه شروع می‌شود.
+function weekRange(date) {
  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate(),12);
- const day=d.getDay();
- d.setDate(d.getDate()-day);
+ d.setDate(d.getDate()-d.getDay());
  const start=isoDate(d);
  d.setDate(d.getDate()+7);
  return {start,end:isoDate(d)};
 }
 
-function render() {
- const now=new Date();
- const todayISO=isoDate(now);
- const monthRange=jalaliMonthRange(now);
-
- let monthTotal=0;
- Object.entries(data).forEach(([k,v])=>{
-  if(k>=monthRange.start && k<monthRange.end)
-   monthTotal+=total(v);
- });
-
- $("todayTotal").textContent=money(total(data[todayISO]||{}));
- $("monthTotal").textContent=money(monthTotal);
-
- const selected=parseJalali($("date").value);
- const selectedData=selected ? (data[selected]||{}) : {};
- $("going").value=selectedData.going ?? "";
- $("returning").value=selectedData.returning ?? "";
-
- const range=reportMode==="week"
-  ? jalaliWeekRange(now)
-  : jalaliMonthRange(now);
-
- let g=0,r=0,days=0;
-
- Object.entries(data).forEach(([key,v])=>{
-  if(key>=range.start && key<range.end){
-   g+=Number(v.going)||0;
-   r+=Number(v.returning)||0;
-   if(total(v)>0) days++;
+function sumRange(range) {
+ let going=0,returning=0,days=0;
+ Object.entries(data).forEach(([key,r])=>{
+  if(key>=range.start && key<range.end) {
+   going+=Number(r.going)||0;
+   returning+=Number(r.returning)||0;
+   if(total(r)>0) days++;
   }
  });
+ return {going,returning,total:going+returning,days};
+}
 
- $("reportGoing").textContent=money(g);
- $("reportReturn").textContent=money(r);
- $("reportTotal").textContent=money(g+r);
- $("reportDays").textContent=days.toLocaleString("fa-IR");
+function render() {
+ const now=new Date();
+ const today=isoDate(now);
+ const wr=weekRange(now);
+ const mr=monthRange(now);
+ const todayRecord=data[today]||{};
+
+ $("todayLabel").textContent="امروز: "+now.toLocaleDateString("fa-IR",{
+  weekday:"long",year:"numeric",month:"long",day:"numeric"
+ });
+
+ $("todayTotal").textContent=money(total(todayRecord));
+ $("weekTotal").textContent=money(sumRange(wr).total);
+ $("monthTotal").textContent=money(sumRange(mr).total);
+
+ const all=sumRange({start:"0000-01-01",end:"9999-12-31"});
+ $("average").textContent=money(all.days?Math.round(all.total/all.days):0);
+
+ const selected=parseJalali($("date").value);
+ const r=selected ? data[selected]||{} : {};
+ $("going").value=r.going ?? "";
+ $("returning").value=r.returning ?? "";
+
+ const report=sumRange(reportMode==="week"?wr:mr);
+ $("reportGoing").textContent=money(report.going);
+ $("reportReturn").textContent=money(report.returning);
+ $("reportTotal").textContent=money(report.total);
+ $("reportDays").textContent=report.days.toLocaleString("fa-IR");
+
+ $("weekBtn").style.background=reportMode==="week"?"#24533f":"#223532";
+ $("monthBtn").style.background=reportMode==="month"?"#24533f":"#223532";
 
  const keys=Object.keys(data)
   .filter(k=>total(data[k])>0)
   .sort((a,b)=>b.localeCompare(a));
 
  $("history").innerHTML="";
-
- if(!keys.length){
-  $("history").textContent="هنوز کرایه‌ای ثبت نشده.";
+ if(!keys.length) {
+  $("history").textContent="هنوز هزینه‌ای ثبت نشده.";
  }
 
  keys.forEach(key=>{
-  const v=data[key];
+  const r=data[key];
   const item=document.createElement("div");
   item.className="entry";
 
-  const date=document.createElement("strong");
-  date.textContent=jalaliText(fromISO(key));
+  const title=document.createElement("div");
+  title.className="entry-title";
+  title.textContent=jalaliText(fromISO(key));
 
-  const details=document.createElement("div");
-  details.textContent=
-   `رفت: ${money(v.going)} | برگشت: ${money(v.returning)} | مجموع: ${money(total(v))}`;
+  const detail=document.createElement("div");
+  detail.className="entry-detail";
+  detail.textContent=`رفت: ${money(r.going)} | برگشت: ${money(r.returning)} | مجموع: ${money(total(r))}`;
+
+  const edit=document.createElement("button");
+  edit.className="secondary";
+  edit.textContent="ویرایش";
+  edit.onclick=()=>{
+   $("date").value=jalaliText(fromISO(key));
+   $("going").value=r.going ?? "";
+   $("returning").value=r.returning ?? "";
+   window.scrollTo({top:0,behavior:"smooth"});
+  };
 
   const del=document.createElement("button");
   del.className="danger";
-  del.textContent="حذف این روز";
+  del.textContent="حذف";
+  del.style.marginRight="7px";
   del.onclick=()=>{
-   if(confirm("این سابقه حذف شود؟")){
+   if(confirm("این روز حذف شود؟")){
     delete data[key];
     persist();
     render();
    }
   };
 
-  item.append(date,details,del);
-  $("history").appendChild(item);
+  item.append(title,detail,edit,del);
+  $("history").append(item);
  });
 }
 
 $("save").onclick=()=>{
- const d=parseJalali($("date").value);
+ const date=parseJalali($("date").value);
  const a=$("going").value;
  const b=$("returning").value;
 
- if(!d){
+ if(!date){
   alert("تاریخ شمسی معتبر وارد کن؛ مثل ۱۴۰۵/۰۷/۲۰");
   return;
  }
-
- if(a==="" && b===""){
-  delete data[d];
- } else {
-  if(Number(a)<0 || Number(b)<0){
-   alert("هزینه نمی‌تواند منفی باشد.");
-   return;
-  }
-  data[d]={going:Number(a)||0,returning:Number(b)||0};
+ if(a===""&&b===""){
+  alert("حداقل یکی از هزینه‌ها را وارد کن.");
+  return;
+ }
+ if((a!==""&&(!Number.isFinite(Number(a))||Number(a)<0))||
+    (b!==""&&(!Number.isFinite(Number(b))||Number(b)<0))){
+  alert("مبلغ واردشده معتبر نیست.");
+  return;
  }
 
+ data[date]={going:Number(a)||0,returning:Number(b)||0};
  persist();
  render();
  alert("کرایه‌ها ذخیره شد ✅");
 };
 
 $("date").addEventListener("change",render);
-
-$("week").onclick=()=>{reportMode="week";render();};
-$("month").onclick=()=>{reportMode="month";render();};
+$("weekBtn").onclick=()=>{reportMode="week";render();};
+$("monthBtn").onclick=()=>{reportMode="month";render();};
 
 $("clear").onclick=()=>{
- if(confirm("همه سوابق پاک شوند؟")){
+ if(confirm("تمام سوابق پاک شوند؟ قبلش از اطلاعات پشتیبان بگیر.")){
   data={};
   persist();
   render();
@@ -314,41 +386,47 @@ $("clear").onclick=()=>{
 };
 
 $("backup").onclick=()=>{
- const blob=new Blob([JSON.stringify(data,null,2)],{
-  type:"application/json"
- });
+ const blob=new Blob([JSON.stringify({
+  app:"school-fare-dashboard",
+  version:2,
+  records:data
+ },null,2)],{type:"application/json"});
  const url=URL.createObjectURL(blob);
  const a=document.createElement("a");
  a.href=url;
  a.download="school-fare-backup.json";
  a.click();
- URL.revokeObjectURL(url);
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 
-$("restore").onclick=()=>$("file").click();
+$("restore").onclick=()=>$("backupFile").click();
 
-$("file").onchange=async e=>{
- const f=e.target.files[0];
- if(!f)return;
+$("backupFile").onchange=async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
 
  try{
-  const restored=JSON.parse(await f.text());
-  if(!restored || typeof restored!=="object" || Array.isArray(restored))
+  const obj=JSON.parse(await file.text());
+  const restored=obj.records || obj;
+
+  if(!restored||typeof restored!=="object"||Array.isArray(restored))
    throw Error();
 
-  for(const [k,v] of Object.entries(restored)){
-   if(!/^\d{4}-\d{2}-\d{2}$/.test(k) ||
-      !v || typeof v!=="object" ||
-      !Number.isFinite(Number(v.going)||0) ||
-      !Number.isFinite(Number(v.returning)||0))
+  for(const [key,r] of Object.entries(restored)){
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||!r||typeof r!=="object")
     throw Error();
+   for(const field of ["going","returning"]){
+    if(r[field]!==undefined &&
+       (!Number.isFinite(Number(r[field]))||Number(r[field])<0))
+     throw Error();
+   }
   }
 
   if(confirm("اطلاعات فعلی با پشتیبان جایگزین شود؟")){
    data=restored;
    persist();
    render();
-   alert("بازیابی انجام شد.");
+   alert("بازیابی انجام شد ✅");
   }
  }catch(err){
   alert("فایل پشتیبان معتبر نیست.");
@@ -356,44 +434,44 @@ $("file").onchange=async e=>{
  e.target.value="";
 };
 
-// یادآوری ساعت ۷ و ۱۴؛ صفحه باید باز بماند.
-let reminderInterval=null;
-
+// یادآوری در ساعت‌های ۰۷:۰۰ و ۱۴:۰۰، تا وقتی صفحه باز است
 $("reminders").onclick=async()=>{
  if(!("Notification" in window)){
-  alert("مرورگر از اعلان پشتیبانی نمی‌کند.");
+  alert("این مرورگر اعلان را پشتیبانی نمی‌کند.");
   return;
  }
 
- const permission=await Notification.requestPermission();
- if(permission!=="granted"){
-  alert("اجازه اعلان داده نشد.");
-  return;
+ try{
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted"){
+   alert("اجازه اعلان داده نشد.");
+   return;
+  }
+
+  if(reminderTimer) clearInterval(reminderTimer);
+
+  function checkTime(){
+   const d=new Date();
+   const hm=`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+   if(hm!=="07:00"&&hm!=="14:00")return;
+
+   const key=`schoolFareReminder_${isoDate(d)}_${hm}`;
+   if(localStorage.getItem(key))return;
+
+   new Notification("یادآوری کرایه مدرسه",{
+    body:hm==="07:00"
+     ?"وقت ثبت کرایه رفت مدرسه است."
+     :"وقت ثبت کرایه برگشت مدرسه است."
+   });
+   localStorage.setItem(key,"1");
+  }
+
+  checkTime();
+  reminderTimer=setInterval(checkTime,10000);
+  alert("یادآوری فعال شد. صفحه را باز نگه دار.");
+ }catch(e){
+  alert("فعال‌کردن اعلان ممکن نشد. مجوز مرورگر را بررسی کن.");
  }
-
- alert("یادآوری فعال شد؛ صفحه را باز نگه دار.");
-
- if(reminderInterval) clearInterval(reminderInterval);
-
- function checkTime(){
-  const d=new Date();
-  const hm=`${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  if(hm!=="07:00" && hm!=="14:00") return;
-
-  const key=`fareReminder_${isoDate(d)}_${hm}`;
-  if(localStorage.getItem(key)) return;
-
-  new Notification("یادآوری کرایه مدرسه",{
-   body:hm==="07:00"
-    ?"وقت ثبت کرایه رفت مدرسه است."
-    :"وقت ثبت کرایه برگشت مدرسه است."
-  });
-
-  localStorage.setItem(key,"1");
- }
-
- checkTime();
- reminderInterval=setInterval(checkTime,10000);
 };
 
 render();
